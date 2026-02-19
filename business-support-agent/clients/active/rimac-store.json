@@ -1,0 +1,116 @@
+{
+  "clientId": "rimac-store",
+  "clientName": "Rimac Merchandise Store",
+  "industry": "ecommerce",
+  "subscription": {
+    "tier": "pro",
+    "monthlyFee": 697,
+    "startDate": "2026-02-15",
+    "status": "active"
+  },
+  "agent": {
+    "name": "RimacBot",
+    "avatar": "",
+    "platforms": ["web", "discord"],
+    "businessHours": "24/7",
+    "timezone": "Europe/Zagreb"
+  },
+  "branding": {
+    "primaryColor": "#000000",
+    "companyName": "Rimac Store",
+    "companyWebsite": "https://store.rimac-automobili.com"
+  },
+  "knowledge": {
+    "companyInfo": {
+      "name": "Rimac Merchandise Store",
+      "description": "Official merchandise for Rimac Automobili fans",
+      "website": "https://store.rimac-automobili.com",
+      "supportEmail": "support@rimac-store.com"
+    },
+    "products": [
+      {
+        "name": "Rimac T-Shirt",
+        "price": "€29.99",
+        "description": "Official Rimac branded cotton t-shirt"
+      },
+      {
+        "name": "Rimac Cap",
+        "price": "€24.99",
+        "description": "Embroidered Rimac logo cap"
+      },
+      {
+        "name": "Nevera Model Car",
+        "price": "€149.99",
+        "description": "1:18 scale Rimac Nevera model"
+      }
+    ],
+    "policies": {
+      "returns": "30-day return policy for unworn items with tags attached",
+      "shipping": "Free shipping on orders over €50 within EU. Standard shipping 3-5 business days.",
+      "refunds": "Refunds processed within 5-7 business days after item received",
+      "warranty": "Manufacturing defects covered for 1 year"
+    },
+    "faqs": [
+      {
+        "question": "Do you ship internationally?",
+        "answer": "Yes! We ship worldwide. EU shipping is free over €50, international shipping costs vary by location."
+      },
+      {
+        "question": "How do I track my order?",
+        "answer": "You'll receive a tracking number via email once your order ships. You can track it on our website or the carrier's site."
+      },
+      {
+        "question": "What sizes are available?",
+        "answer": "Our t-shirts come in sizes XS-XXL. Check the size guide on each product page for measurements."
+      }
+    ],
+    "commonIssues": [
+      {
+        "issue": "Wrong size received",
+        "solution": "We'll send a prepaid return label. Once we receive the item, we'll ship the correct size within 2 business days."
+      },
+      {
+        "issue": "Item damaged in shipping",
+        "solution": "We apologize! Please send photos to support@rimac-store.com and we'll send a replacement immediately."
+      }
+    ]
+  },
+  "escalation": {
+    "email": "support@rimac-store.com",
+    "triggers": [
+      "legal threat",
+      "refund over €200",
+      "damaged product",
+      "missing order",
+      "account security issue"
+    ],
+    "escalationMessage": "I want to make sure you receive the best assistance. Let me connect you with our specialist team at support@rimac-store.com who can help you further."
+  },
+  "integrations": {
+    "discord": {
+      "enabled": false,
+      "guildId": "",
+      "token": "",
+      "channels": []
+    },
+    "telegram": {
+      "enabled": false,
+      "token": ""
+    },
+    "shopify": {
+      "enabled": true,
+      "apiKey": "your-api-key",
+      "storeName": "rimac-store"
+    },
+    "database": {
+      "enabled": false,
+      "connectionString": ""
+    }
+  },
+  "analytics": {
+    "trackSatisfaction": true,
+    "trackResponseTime": true,
+    "weeklyReport": true,
+    "reportEmail": "analytics@rimac-store.com"
+  }
+}

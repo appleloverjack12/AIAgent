@@ -1,0 +1,78 @@
+{
+  "clientId": "CHANGE_THIS",
+  "clientName": "COMPANY_NAME",
+  "industry": "ecommerce|saas|gaming|crypto|education",
+  "subscription": {
+    "tier": "basic|pro|enterprise",
+    "monthlyFee": 297,
+    "startDate": "2026-02-15",
+    "status": "active"
+  },
+  "agent": {
+    "name": "SupportBot",
+    "avatar": "",
+    "platforms": ["discord", "web", "telegram"],
+    "businessHours": "24/7",
+    "timezone": "Europe/Zagreb"
+  },
+  "branding": {
+    "primaryColor": "#4F46E5",
+    "companyName": "COMPANY_NAME",
+    "companyWebsite": "https://example.com"
+  },
+  "knowledge": {
+    "companyInfo": {
+      "name": "",
+      "description": "",
+      "website": "",
+      "supportEmail": ""
+    },
+    "products": [],
+    "policies": {
+      "returns": "",
+      "shipping": "",
+      "refunds": "",
+      "warranty": ""
+    },
+    "faqs": [],
+    "commonIssues": []
+  },
+  "escalation": {
+    "email": "support@client.com",
+    "triggers": [
+      "legal issues",
+      "refund over €500",
+      "account security",
+      "angry customer with profanity",
+      "agent is unsure"
+    ],
+    "escalationMessage": "I want to make sure you get the best help. Let me connect you with my colleague at {{email}} who specializes in this."
+  },
+  "integrations": {
+    "discord": {
+      "enabled": false,
+      "guildId": "",
+      "token": "",
+      "channels": []
+    },
+    "telegram": {
+      "enabled": false,
+      "token": ""
+    },
+    "shopify": {
+      "enabled": false,
+      "apiKey": "",
+      "storeName": ""
+    },
+    "database": {
+      "enabled": false,
+      "connectionString": ""
+    }
+  },
+  "analytics": {
+    "trackSatisfaction": true,
+    "trackResponseTime": true,
+    "weeklyReport": true,
+    "reportEmail": ""
+  }
+}
