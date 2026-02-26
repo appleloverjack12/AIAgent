@@ -1,6 +1,6 @@
 import { logger, type IAgentRuntime, type Project, type ProjectAgent } from '@elizaos/core';
 import starterPlugin from './plugin.ts';
-import { character } from './character-news-agent.ts';
+import { character } from './character-fsaa-manager-agent.ts';
 
 const initCharacter = ({ runtime }: { runtime: IAgentRuntime }) => {
   logger.info('Initializing character');
@@ -17,6 +17,6 @@ const project: Project = {
   agents: [projectAgent],
 };
 
-export { character } from './character-news-agent.ts';
+export { character } from './character-fsaa-manager-agent.ts';
 
 export default project;

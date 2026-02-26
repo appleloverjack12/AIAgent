@@ -27,6 +27,7 @@
     "dist"
   ],
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.30",
     "@elizaos/cli": "1.7.2",
     "@elizaos/client": "1.7.2",
     "@elizaos/core": "1.7.2",
@@ -38,7 +39,11 @@
     "@elizaos/plugin-telegram": "^1.6.4",
     "@elizaos/server": "1.7.2",
     "@tanstack/react-query": "^5.67.2",
+    "ai": "^6.0.97",
     "clsx": "^2.1.1",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.67.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwind-merge": "^3.3.1",
@@ -46,20 +51,25 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@types/bun": "latest",
     "@types/node": "^25.2.1",
+    "@types/node-telegram-bot-api": "^0.64.13",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^5.1.1",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6",
-    "@types/bun": "latest"
+    "vite": "^7.2.6"
   },
   "scripts": {
-    "start": "elizaos start",
+    "start": "npm run start:production",
     "dev": "elizaos dev",
     "gen-character": "bun run src/generate-character.ts",
     "build": "bun run build.ts",
+    "schedule:kajgod": "node scripts/schedule-kajgod.js",
+    "schedule:fsaa": "node scripts/schedule-news.js",
+    "start:agent": "elizaos start",
+    "start:production": "concurrently \"elizaos start\" \"node scripts/schedule-kajgod.js\" \"node scripts/schedule-fsaa.js\"",
     "lint": "prettier --write ./src",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",

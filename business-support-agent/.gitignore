@@ -1,4 +1,7 @@
 # dependencies (bun install)
+
+.eliza/
+
 node_modules
 
 # output

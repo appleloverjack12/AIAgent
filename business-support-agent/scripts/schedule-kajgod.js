@@ -1,12 +1,12 @@
 import 'dotenv/config';
 import cron from 'node-cron';
 import TelegramBot from 'node-telegram-bot-api';
-import { character } from '../src/character-fsaa-manager-agent.ts';
+import { character } from '../src/character-kajgod-agent.ts';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN_KAJGOD);
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -66,7 +66,7 @@ cron.schedule('* * * * *', async () => {
     try {
       await bot.sendMessage(
         chatId, 
-        `🍀 *FSAA Briefing*\n📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}\n\n${briefing}`,
+        `🍀 *Kajgod Briefing*\n📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}\n\n${briefing}`,
         { parse_mode: 'Markdown' }
       );
       console.log(`✅ Sent to ${chatId}`);
