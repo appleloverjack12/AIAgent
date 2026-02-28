@@ -65,7 +65,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "elizaos dev",
-    "build": "tsc --skipLibCheck --noEmitOnError false",
+    "build": "tsc",
     "railway-build": "tsc",
     "start:production": "node dist/index.js",
     "test:bots": "node scripts/test-briefing.js",
