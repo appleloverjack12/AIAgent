@@ -1,41 +1,16 @@
-# Dependencies - THESE ARE THE BIGGEST SAVINGS!
+# Dependencies - already installed in image
 node_modules
 bun.lock
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
+# Source maps - large and not needed in production
+*.js.map
+*.ts.map
+*.tsbuildinfo
 
-dist
-out
-build
-*.tgz
-*.tar.gz
-
-
-.env
-.env.local
-.env.*.local
-.env.example
-.env.production
-.env.development
-
-
-.git
-.gitignore
-.gitattributes
-.github
-.gitlab
-
-
-logs
-*.log
-npm-debug.log*
-bun-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-
+# Tests - not needed in production
 __tests__
 test
 tests
@@ -50,16 +25,41 @@ vitest.config.js
 cypress
 cypress.config.ts
 
+# Source files - we only need compiled JS
+src/*.ts
+src/**/*.ts
+!src/*.js
+!src/**/*.js
 
-.cache
-.temp
-.tmp
-*.tsbuildinfo
-.eslintcache
-.stylelintcache
-.parcel-cache
+# Documentation
+README.md
+CLAUDE.md
+CONTRIBUTING.md
+LICENSE
+docs
+*.md
+!README.md
 
+# Git and version control
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab
 
+# Environment - never include these
+.env
+.env.*
+.env.local
+.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# IDE and OS files
 .vscode
 .idea
 *.swp
@@ -67,43 +67,72 @@ cypress.config.ts
 *~
 .DS_Store
 Thumbs.db
+desktop.ini
 
+# Cache and temp files
+.cache
+.temp
+.tmp
+.eslintcache
+.stylelintcache
+.parcel-cache
 
-README.md
-CLAUDE.md
-CONTRIBUTING.md
-LICENSE
-docs
-*.md
-!README.md  # Keep README if you want it in the image
-
-
+# Build scripts - not needed at runtime
 scripts/
 bin/
 tools/
 *.sh
 *.bash
 *.zsh
+build.ts
+build.js
+build-simple.js
 
+# Config files - not needed in production
+tsconfig.json
+tsconfig.build.json
+tailwind.config.js
+postcss.config.js
+vite.config.ts
+cypress.config.ts
+bunfig.toml
 
-*.js.map
-*.ts.map
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.yaml
 
-
-characters/  # You might want to keep these if needed
+# ElizaOS specific
+characters/
 clients/
 plugins/
 *.log
 *.pid
 
+# Frontend assets (if not needed)
+public/
+static/
+assets/
+*.css
+*.scss
+*.sass
 
-.DS_Store
-Thumbs.db
-desktop.ini
-$RECYCLE.BIN/
+# Build stage
+FROM node:23.3.0-slim AS builder
 
-# Docker files - DON'T NEED THESE INSIDE THE IMAGE
-Dockerfile
-.dockerignore
-docker-compose.yml
-docker-compose.yaml
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:23.3.0-slim
+
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+
+CMD ["node", "dist/index.js"]
