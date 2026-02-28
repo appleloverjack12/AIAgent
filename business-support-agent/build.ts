@@ -30,7 +30,10 @@ async function build() {
       (async () => {
         console.log('📦 Bundling with Bun...');
         const result = await Bun.build({
-          entrypoints: ['./src/index.ts'],
+          entrypoints: [
+            './src/index.ts',
+            './src/scheduler.ts'  // Added scheduler.ts
+          ],
           outdir: './dist',
           target: 'node',
           format: 'esm',
@@ -47,6 +50,8 @@ async function build() {
             '@elizaos/plugin-sql',
             '@elizaos/cli',
             'zod',
+            'node-cron',  // Add this
+            'uuid'        // Add this
           ],
           naming: {
             entry: '[dir]/[name].[ext]',
@@ -61,6 +66,12 @@ async function build() {
         const totalSize = result.outputs.reduce((sum, output) => sum + output.size, 0);
         const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
         console.log(`✓ Built ${result.outputs.length} file(s) - ${sizeMB}MB`);
+        
+        // Log which files were built
+        console.log('Files built:');
+        result.outputs.forEach(output => {
+          console.log(`  - ${output.path}`);
+        });
 
         return result;
       })(),
