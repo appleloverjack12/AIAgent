@@ -60,7 +60,7 @@ export function generateCharacter(clientConfig: ClientConfig): Character {
     ],
     settings: {
       secrets: {},
-      avatar: clientConfig.agent.avatar || undefined,
+      avatar: clientConfig.agent.avatar || "",
     },
     system: systemPrompt,
     bio: [
