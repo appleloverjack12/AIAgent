@@ -32,7 +32,7 @@ async function build() {
         const result = await Bun.build({
           entrypoints: [
             './src/index.ts',
-            './src/scheduler.ts'  // Added scheduler.ts
+            './src/scheduler.ts'
           ],
           outdir: './dist',
           target: 'node',
@@ -48,10 +48,14 @@ async function build() {
             '@elizaos/core',
             '@elizaos/plugin-bootstrap',
             '@elizaos/plugin-sql',
+            '@elizaos/plugin-web-search',  // Added this
+            '@elizaos/plugin-openai',      // Added this
+            '@elizaos/plugin-telegram',    // Added this
             '@elizaos/cli',
             'zod',
-            'node-cron',  // Add this
-            'uuid'        // Add this
+            'node-cron',
+            'uuid',
+            'node-fetch',  // ← ADD THIS!
           ],
           naming: {
             entry: '[dir]/[name].[ext]',

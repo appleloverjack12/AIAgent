@@ -1,24 +1,29 @@
 import cron from 'node-cron';
 import { logger, type IAgentRuntime } from '@elizaos/core';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import fetch from 'node-fetch';
 
-// Type for UUID string
-type UUID = `${string}-${string}-${string}-${string}-${string}`;
+interface TelegramResponse {
+  ok: boolean;
+  description?: string;
+}
 
-// Convert Telegram chat ID to a valid UUID format
-function chatIdToUUID(chatId: string): UUID {
-  // If it's already a valid UUID, return it
-  if (uuidValidate(chatId)) {
-    return chatId as UUID;
+async function sendTelegramMessage(token: string, chatId: string, text: string): Promise<boolean> {
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text
+      })
+    });
+    
+    const data = await response.json() as TelegramResponse;
+    return data.ok;
+  } catch (error) {
+    logger.error('Telegram send error:', error);
+    return false;
   }
-  
-  // Create a deterministic UUID from the chat ID using MD5 hash
-  // This ensures the same chat ID always maps to the same UUID
-  const crypto = require('crypto');
-  const hash = crypto.createHash('md5').update(chatId).digest('hex');
-  
-  // Format as UUID: 8-4-4-4-12
-  return `${hash.slice(0,8)}-${hash.slice(8,12)}-${hash.slice(12,16)}-${hash.slice(16,20)}-${hash.slice(20,32)}` as UUID;
 }
 
 export function registerSchedulers(runtime: IAgentRuntime) {
@@ -27,69 +32,47 @@ export function registerSchedulers(runtime: IAgentRuntime) {
   const fsaaChatId = process.env.FSAA_CHAT_ID!;
   const kajgodChatId = process.env.KAJGOD_CHAT_ID!;
 
-  // Convert chat IDs to proper UUID format for the database
-  const fsaaRoomId = chatIdToUUID(fsaaChatId);
-  const kajgodRoomId = chatIdToUUID(kajgodChatId);
-
-  logger.info(`📊 Scheduler configured:`);
-  logger.info(`   - FSAA Chat ID: ${fsaaChatId} -> Room UUID: ${fsaaRoomId}`);
-  logger.info(`   - Kajgod Chat ID: ${kajgodChatId} -> Room UUID: ${kajgodRoomId}`);
-
-  // Send /briefing command to FSAA at 8 AM daily
-  cron.schedule(
-    '0 8 * * *', // 8:00 AM every day
-    async () => {
-      logger.info('🚗 Sending FSAA /briefing command');
-      
-      try {
-        await runtime.createMemory(
-          {
-            id: uuidv4() as UUID,
-            entityId: runtime.agentId,
-            agentId: runtime.agentId,
-            roomId: fsaaRoomId, // Now using proper UUID format
-            content: {
-              text: "/briefing",
-            },
-            createdAt: Date.now()
-          },
-          'messages'
-        );
-        logger.info('✅ FSAA /briefing command sent');
-      } catch (error) {
-        logger.error('❌ Error sending FSAA command:', error);
-      }
-    },
-    { timezone: 'Europe/Zagreb' }
-  );
-
-  // Send /briefing command to Kajgod at 8 AM daily
+  // FSAA briefing at 8 AM daily
   cron.schedule(
     '0 8 * * *',
     async () => {
-      logger.info('🍀 Sending Kajgod /briefing command');
+      logger.info('🚗 Triggering FSAA briefing...');
       
-      try {
-        await runtime.createMemory(
-          {
-            id: uuidv4() as UUID,
-            entityId: runtime.agentId,
-            agentId: runtime.agentId,
-            roomId: kajgodRoomId, // Now using proper UUID format
-            content: {
-              text: "/briefing",
-            },
-            createdAt: Date.now()
-          },
-          'messages'
-        );
-        logger.info('✅ Kajgod /briefing command sent');
-      } catch (error) {
-        logger.error('❌ Error sending Kajgod command:', error);
-      }
+      const query = "What are today's automotive business developments, sponsor opportunities, and Formula Student news? Search the web and provide today's FSAA management briefing with specific companies and actionable insights. Include contact information for key opportunities.";
+      
+      await sendTelegramMessage(
+        process.env.TELEGRAM_BOT_TOKEN!,
+        fsaaChatId,
+        query
+      );
+      
+      logger.info('✅ FSAA briefing request sent');
     },
     { timezone: 'Europe/Zagreb' }
   );
 
-  logger.info('✅ Schedulers active - Daily briefings at 8:00 AM');
+  // Kajgod briefing at 8 AM daily
+  cron.schedule(
+    '0 8 * * *',
+    async () => {
+      logger.info('🍀 Triggering Kajgod briefing...');
+      
+      const query = "Daj mi detaljan današnji Kajgod izvještaj. Pretraži web za najnovije poslovne vijesti, prilike za eventove, potencijalne klijente, i partnerske prilike iz Hrvatske, Slovenije i Austrije. Fokusiraj se na konkretne tvrtke i prilike.";
+      
+      await sendTelegramMessage(
+        process.env.TELEGRAM_BOT_TOKEN_KAJGOD!,
+        kajgodChatId,
+        query
+      );
+      
+      logger.info('✅ Kajgod briefing request sent');
+    },
+    { timezone: 'Europe/Zagreb' }
+  );
+
+  logger.info('✅ Schedulers registered - Daily briefings at 8:00 AM');
+}
+
+export function getRuntime(): IAgentRuntime | null {
+  return null;
 }
