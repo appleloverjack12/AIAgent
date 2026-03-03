@@ -1,5 +1,11 @@
 import { type Character } from '@elizaos/core';
 
+console.log('\n=== FSAA ENVIRONMENT DEBUG ===');
+console.log('TELEGRAM_BOT_TOKEN exists:', !!process.env.TELEGRAM_BOT_TOKEN);
+console.log('TELEGRAM_BOT_TOKEN length:', process.env.TELEGRAM_BOT_TOKEN?.length || 0);
+console.log('TELEGRAM_BOT_TOKEN first 10 chars:', process.env.TELEGRAM_BOT_TOKEN?.substring(0, 10) || 'MISSING');
+console.log('==============================\n');
+
 export const character: Character = {
   name: 'FSAAManagerAgent',
   

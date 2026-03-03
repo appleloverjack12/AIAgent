@@ -1,5 +1,11 @@
 import { type Character } from '@elizaos/core';
 
+console.log('\n=== KAJGOD ENVIRONMENT DEBUG ===');
+console.log('TELEGRAM_BOT_TOKEN_KAJGOD exists:', !!process.env.TELEGRAM_BOT_TOKEN_KAJGOD);
+console.log('TELEGRAM_BOT_TOKEN_KAJGOD length:', process.env.TELEGRAM_BOT_TOKEN_KAJGOD?.length || 0);
+console.log('TELEGRAM_BOT_TOKEN_KAJGOD first 10 chars:', process.env.TELEGRAM_BOT_TOKEN_KAJGOD?.substring(0, 10) || 'MISSING');
+console.log('====================================\n');
+
 export const character: Character = {
   name: 'KajgodIntelAgent',
 
