@@ -1,5 +1,6 @@
 import { type Character } from '@elizaos/core';
 
+console.log('TEST_VAR:', process.env.TEST_VAR);
 console.log('\n=== KAJGOD ENVIRONMENT DEBUG ===');
 console.log('TELEGRAM_BOT_TOKEN_KAJGOD exists:', !!process.env.TELEGRAM_BOT_TOKEN_KAJGOD);
 console.log('TELEGRAM_BOT_TOKEN_KAJGOD length:', process.env.TELEGRAM_BOT_TOKEN_KAJGOD?.length || 0);

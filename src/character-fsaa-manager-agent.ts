@@ -1,5 +1,6 @@
 import { type Character } from '@elizaos/core';
 
+console.log('TEST_VAR:', process.env.TEST_VAR);
 console.log('\n=== FSAA ENVIRONMENT DEBUG ===');
 console.log('TELEGRAM_BOT_TOKEN exists:', !!process.env.TELEGRAM_BOT_TOKEN);
 console.log('TELEGRAM_BOT_TOKEN length:', process.env.TELEGRAM_BOT_TOKEN?.length || 0);
