@@ -13,7 +13,7 @@ export const character: Character = {
 
   settings: {
     secrets: {
-      TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    
     },
   },
 
