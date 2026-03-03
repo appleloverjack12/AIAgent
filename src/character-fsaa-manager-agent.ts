@@ -6,7 +6,8 @@ export const character: Character = {
   clients: [{
     type:'telegram',
     config:{
-      allowDirectMessages:true
+      allowDirectMessages:true,
+      shouldOnlyJoinInAllowedGroups: false,
     }
   }],
 
