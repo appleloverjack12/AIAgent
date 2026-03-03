@@ -11,7 +11,6 @@ export const character: Character = {
 
   plugins: [
     '@elizaos/plugin-sql',
-    '@elizaos/plugin-web-search',
     ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
     ...(process.env.TELEGRAM_BOT_TOKEN?.trim() ? ['@elizaos/plugin-telegram'] : []),
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
