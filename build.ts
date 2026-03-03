@@ -1,7 +1,4 @@
 #!/usr/bin/env bun
-/**
- * Self-contained build script for ElizaOS projects
- */
 
 import { existsSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
@@ -19,85 +16,39 @@ async function build() {
   console.log('🚀 Building project...');
 
   try {
-    // Clean previous build
     await cleanBuild('dist');
-
-    // Run JavaScript build and TypeScript declarations in parallel
     console.log('Starting build tasks...');
 
-    const [buildResult, tscResult] = await Promise.all([
-      // Task 1: Build with Bun
+    const [buildResult] = await Promise.all([
       (async () => {
         console.log('📦 Bundling with Bun...');
         const result = await Bun.build({
-          entrypoints: [
-            './src/index.ts',
-            './src/scheduler.ts'
-          ],
+          entrypoints: ['./src/index.ts', './src/scheduler.ts'],
           outdir: './dist',
           target: 'node',
           format: 'esm',
           sourcemap: true,
           minify: false,
           external: [
-            'dotenv',
-            'fs',
-            'path',
-            'https',
-            'node:*',
-            '@elizaos/core',
-            '@elizaos/plugin-bootstrap',
-            '@elizaos/plugin-sql',
-            '@elizaos/plugin-web-search',  // Added this
-            '@elizaos/plugin-openai',      // Added this
-            '@elizaos/plugin-telegram',    // Added this
-            '@elizaos/cli',
-            'zod',
-            'node-cron',
-            'uuid',
-            'node-fetch',  // ← ADD THIS!
+            'dotenv', 'fs', 'path', 'https', 'node:*',
+            '@elizaos/core', '@elizaos/plugin-bootstrap', '@elizaos/plugin-sql',
+            '@elizaos/plugin-telegram', '@elizaos/cli', 'zod',
+            'node-cron', 'uuid', 'node-fetch',
           ],
-          naming: {
-            entry: '[dir]/[name].[ext]',
-          },
+          naming: { entry: '[dir]/[name].[ext]' },
         });
 
         if (!result.success) {
           console.error('✗ Build failed:', result.logs);
-          return { success: false, outputs: [] };
-        }
-
-        const totalSize = result.outputs.reduce((sum, output) => sum + output.size, 0);
-        const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
-        console.log(`✓ Built ${result.outputs.length} file(s) - ${sizeMB}MB`);
-        
-        // Log which files were built
-        console.log('Files built:');
-        result.outputs.forEach(output => {
-          console.log(`  - ${output.path}`);
-        });
-
-        return result;
-      })(),
-
-      // Task 2: Generate TypeScript declarations
-      (async () => {
-        console.log('📝 Generating TypeScript declarations...');
-        try {
-          await $`tsc --emitDeclarationOnly --incremental --project ./tsconfig.build.json`.quiet();
-          console.log('✓ TypeScript declarations generated');
-          return { success: true };
-        } catch (error) {
-          console.warn('⚠ Failed to generate TypeScript declarations');
-          console.warn('  This is usually due to test files or type errors.');
           return { success: false };
         }
+
+        console.log(`✓ Built ${result.outputs.length} file(s)`);
+        return result;
       })(),
     ]);
 
-    if (!buildResult.success) {
-      return false;
-    }
+    if (!buildResult.success) return false;
 
     const elapsed = ((performance.now() - start) / 1000).toFixed(2);
     console.log(`✅ Build complete! (${elapsed}s)`);
@@ -108,14 +59,6 @@ async function build() {
   }
 }
 
-// Execute the build
 build()
-  .then((success) => {
-    if (!success) {
-      process.exit(1);
-    }
-  })
-  .catch((error) => {
-    console.error('Build script error:', error);
-    process.exit(1);
-  });
+  .then((success) => { if (!success) process.exit(1); })
+  .catch((error) => { console.error('Build script error:', error); process.exit(1); });
