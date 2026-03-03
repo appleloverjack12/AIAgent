@@ -3,6 +3,13 @@ import { type Character } from '@elizaos/core';
 export const character: Character = {
   name: 'KajgodIntelAgent',
 
+  clients: [{
+    type:'telegram',
+    config:{
+      allowDirectMessages:true
+    }
+  }],
+
   settings: {
     secrets: {
       TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN_KAJGOD,
