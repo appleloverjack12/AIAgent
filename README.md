@@ -1,15 +1,10 @@
 # Project Starter
 
-This is the starter template for ElizaOS projects.
+Scheduled AI news agents 
 
 ## Features
 
-- Pre-configured project structure for ElizaOS development
-- Comprehensive testing setup with component and e2e tests
-- Default character configuration with plugin integration
-- Example service, action, and provider implementations
-- TypeScript configuration for optimal developer experience
-- Built-in documentation and examples
+- Provide fresh neat-picked news daily at 8 AM CET
 
 ## Getting Started
 
