@@ -2,13 +2,8 @@
   "name": "business-support-agent",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/index.js",
-  "scripts": {
-    "start": "elizaos start",
-    "dev": "elizaos dev",
-    "build": "tsc",
-    "railway-build": "tsc",
-    "start:production": "elizaos start"
+  "overrides": {
+    "node-fetch": "2.7.0"
   },
   "dependencies": {
     "@elizaos/cli": "1.7.2",
@@ -27,6 +22,13 @@
     "@types/node-fetch": "2.6.11",
     "@types/uuid": "^10.0.0",
     "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "start": "elizaos start",
+    "dev": "elizaos dev",
+    "build": "tsc",
+    "railway-build": "tsc",
+    "start:production": "elizaos start"
   },
   "repository": {
     "type": "git",
