@@ -4,19 +4,14 @@ export const character: Character = {
   name: 'FSAAManagerAgent',
   
   clients: [{
-    token: process.env.TELEGRAM_BOT_TOKEN,
     type:'telegram',
     config:{
+      token: process.env.TELEGRAM_BOT_TOKEN,
       allowDirectMessages:true,
       shouldOnlyJoinInAllowedGroups: false,
     }
   }],
 
-  settings: {
-    secrets: {
-    
-    },
-  },
 
   plugins: [
     '@elizaos/plugin-sql',
