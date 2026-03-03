@@ -4,6 +4,7 @@ export const character: Character = {
   name: 'KajgodIntelAgent',
 
   clients: [{
+    token: process.env.TELEGRAM_BOT_TOKEN_KAJGOD,
     type:'telegram',
     config:{
       allowDirectMessages:true,
