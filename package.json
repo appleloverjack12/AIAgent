@@ -27,6 +27,7 @@
     "ai": "^6.0.97",
     "node-cron": "^4.2.1",
     "uuid": "^11.0.5",
+    "node-fetch": "^2.7.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
