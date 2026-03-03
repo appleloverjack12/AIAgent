@@ -20,8 +20,8 @@ export const character: Character = {
   plugins: [
     '@elizaos/plugin-sql',
     '@elizaos/plugin-telegram',
-    '@elizaos/plugin-bootstrap',
     ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
+    ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
 
   system: `You are FSAAManagerAgent, the strategic growth and partnership intelligence assistant for Formula Student Alpe Adria.

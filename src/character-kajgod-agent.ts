@@ -20,8 +20,8 @@ export const character: Character = {
   plugins: [
     '@elizaos/plugin-sql',
     '@elizaos/plugin-telegram',
-    '@elizaos/plugin-bootstrap',
     ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
+    ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
 
   system: `You are KajgodIntelAgent — a sharp, no-nonsense morning intelligence assistant for Kajgod, a Croatian full-service marketing and solutions agency (kajgod.agency).
