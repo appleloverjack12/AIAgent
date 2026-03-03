@@ -7,8 +7,8 @@
   "scripts": {
     "start": "elizaos start",
     "dev": "elizaos dev",
-    "build": "bun run build.ts",
-    "railway-build": "bun run build.ts",
+    "build": "tsc",
+    "railway-build": "tsc",
     "start:production": "elizaos start",
     "test:bots": "node scripts/test-briefing.js",
     "type-check": "tsc --noEmit",
