@@ -24,11 +24,9 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "elizaos dev",
-    "build": "tsc",
-    "railway-build": "tsc",
-    "start:production": "node dist/index.js"
+    "start": "elizaos start",
+    "start:production": "elizaos start",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
