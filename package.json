@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
+  "engines": {
+    "node": "18.x"
+  },
   "overrides": {
     "node-fetch": "2.7.0"
   },
