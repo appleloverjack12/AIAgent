@@ -2,6 +2,7 @@
   "name": "business-support-agent",
   "version": "0.1.0",
   "type": "module",
+  "main": "dist/index.js",
   "overrides": {
     "node-fetch": "2.7.0"
   },
@@ -24,10 +25,10 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "cd node_modules/bun && node install.js && cd ../.. && elizaos start",
+    "start": "elizaos start",
     "build": "tsc",
     "railway-build": "tsc",
-    "start:production": "cd node_modules/bun && node install.js && cd ../.. && elizaos start"
+    "start:production": "elizaos start"
   },
   "repository": {
     "type": "git",
