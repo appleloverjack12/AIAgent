@@ -24,8 +24,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "elizaos start",
-    "start:production": "elizaos start",
+    "start": "cd node_modules/bun && node install.js && cd ../.. && elizaos start",
     "build": "tsc"
   },
   "repository": {
