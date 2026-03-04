@@ -24,11 +24,11 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "npx elizaos start",
+    "start": "node dist/index.js",
     "dev": "elizaos dev",
     "build": "tsc",
     "railway-build": "tsc",
-    "start:production": "npx elizaos start"
+    "start:production": "node dist/index.js"
   },
   "repository": {
     "type": "git",
