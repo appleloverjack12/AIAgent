@@ -25,7 +25,9 @@
   },
   "scripts": {
     "start": "cd node_modules/bun && node install.js && cd ../.. && elizaos start",
-    "build": "tsc"
+    "build": "tsc",
+    "railway-build": "tsc",
+    "start:production": "cd node_modules/bun && node install.js && cd ../.. && elizaos start"
   },
   "repository": {
     "type": "git",
