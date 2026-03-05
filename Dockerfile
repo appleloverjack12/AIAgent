@@ -2,14 +2,10 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Create .npmrc to skip optional packages
-RUN echo "omit=optional" > .npmrc
-
-# Install dependencies
-RUN npm ci --omit=optional 2>&1 || npm install --omit=optional
+# Install WITHOUT running any postinstall scripts (skips Ollama)
+RUN npm install --ignore-scripts
 
 # Copy source
 COPY . .
