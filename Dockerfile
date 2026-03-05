@@ -2,17 +2,19 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Copy package files first
 COPY package.json package-lock.json ./
 
-# Install dependencies WITH scripts (this is important)
-RUN npm install
+# Install without scripts
+RUN npm install --ignore-scripts
 
-# FORCE node-fetch v2 by reinstalling it
-RUN npm install node-fetch@2.7.0 --save --force
+# FORCE node-fetch v2 (override telegraf's v3)
+RUN npm install node-fetch@2.7.0 --save --legacy-peer-deps
 
-# Now build
+# Run bun postinstall
+RUN cd node_modules/bun && node install.js || true
+
 COPY . .
+
 RUN npm run build
 
 EXPOSE 3000

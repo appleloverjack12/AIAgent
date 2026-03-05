@@ -6,27 +6,32 @@
   "overrides": {
     "node-fetch": "2.7.0"
   },
-  "resolutions": {
-    "node-fetch": "2.7.0"
-  },
   "dependencies": {
     "@elizaos/cli": "1.7.2",
-    "@elizaos/client": "1.7.2", 
+    "@elizaos/client": "1.7.2",
     "@elizaos/core": "1.7.2",
     "@elizaos/plugin-bootstrap": "1.7.2",
     "@elizaos/plugin-sql": "1.7.2",
     "@elizaos/plugin-telegram": "1.6.4",
     "@elizaos/server": "1.7.2",
     "node-cron": "^4.2.1",
+    "node-fetch": "2.7.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.3",
+    "@types/node-fetch": "2.6.11",
     "@types/uuid": "^10.0.0",
     "typescript": "^5.9.3"
   },
   "scripts": {
     "start": "elizaos start",
-    "build": "tsc"
-  }
+    "build": "tsc",
+    "start:production": "elizaos start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/appleloverjack12/AIAgent.git"
+  },
+  "private": true
 }
