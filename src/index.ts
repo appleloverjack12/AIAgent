@@ -44,14 +44,30 @@ console.log('KAJGOD_CHAT_ID exists:', !!process.env.KAJGOD_CHAT_ID);
 
 // Create healthcheck server
 const server = http.createServer((req, res) => {
-  if (req.url === '/health') {
-    res.writeHead(200);
-    res.end('OK');
-    console.log('💓 Healthcheck ping received');
+  console.log(`📡 Healthcheck request received: ${req.url}`);
+  
+  if (req.url === '/health' || req.url === '/healthz') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    }));
+    console.log('💓 Healthcheck ping successful');
+  } else {
+    res.writeHead(404);
+    res.end('Not found');
   }
 });
-server.listen(3000);
-console.log('✅ Healthcheck server listening on port 3000');
+
+server.listen(3000, '0.0.0.0', () => {
+  console.log('✅ Healthcheck server listening on port 3000');
+});
+
+// Add error handling
+server.on('error', (err) => {
+  console.error('❌ Healthcheck server error:', err);
+});
 
 // Now import ElizaOS modules
 import { logger, type IAgentRuntime, type Project, type ProjectAgent } from '@elizaos/core';
