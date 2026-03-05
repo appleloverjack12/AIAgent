@@ -10,8 +10,6 @@
   },
   "deploy": {
     "startCommand": "",
-    "restartPolicyType": "ON_FAILURE",
-    "healthcheckPath": "/health",
-    "healthcheckTimeout": 300
+    "restartPolicyType": "ON_FAILURE"
   }
 }
