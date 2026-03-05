@@ -1,7 +1,12 @@
 {
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile"
+    "dockerfilePath": "Dockerfile",
+    "watchPatterns": [
+      "src/**",
+      "package.json",
+      "Dockerfile"
+    ]
   },
   "deploy": {
     "startCommand": "",
