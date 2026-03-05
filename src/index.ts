@@ -14,7 +14,7 @@ console.log('📂 Current directory:', process.cwd());
 console.log('='.repeat(80));
 
 // Import required modules
-//import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
@@ -25,9 +25,7 @@ const __dirname = path.dirname(__filename);
 // Load .env from the correct path
 const envPath = path.join(process.cwd(), '.env');
 console.log('📁 Loading .env from:', envPath);
-//const result = dotenv.config({ path: envPath });
-
-
+const result = dotenv.config({ path: envPath });
 
 // Debug environment variables
 console.log('🔍 ENVIRONMENT CHECK:');
@@ -53,14 +51,44 @@ const server = http.createServer((req, res) => {
     res.writeHead(404);
     res.end('Not found');
   }
-
-}
-
-);
+});
 
 server.listen(3000, '0.0.0.0', () => {
   console.log('✅ Healthcheck server listening on port 3000');
 });
+
+// Add error handling for server
+server.on('error', (err) => {
+  console.error('❌ Healthcheck server error:', err);
+});
+
+// Now import ElizaOS modules (after server setup)
+import { logger, type IAgentRuntime, type Project, type ProjectAgent } from '@elizaos/core';
+import { character as fsaaCharacter } from './character-fsaa-manager-agent.js';
+import { character as kajgodCharacter } from './character-kajgod-agent.js';
+import { registerSchedulers } from './scheduler.js';
+
+// Declare global variables BEFORE using them
+let globalRuntime: IAgentRuntime | null = null;
+let schedulersRegistered = false;
+
+console.log('🔧 Setting up message handler...');
+
+// This is a hack to force message responses
+process.on('message', (msg) => {
+  console.log('📨 Received message event:', msg);
+});
+
+// Add this to prevent process from exiting
+process.on('uncaughtException', (error) => {
+  console.error('💥 Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('💥 Unhandled Rejection:', error);
+});
+
+// Set up the message polling
 setTimeout(async () => {
   console.log('🤖 Starting Telegram connection test...');
   
@@ -111,30 +139,7 @@ setTimeout(async () => {
   console.log('✅ Startup complete - keeping process alive');
 }, 5000);
 
-// Add this to prevent process from exiting
-process.on('uncaughtException', (error) => {
-  console.error('💥 Uncaught Exception:', error);
-});
-
-process.on('unhandledRejection', (error) => {
-  console.error('💥 Unhandled Rejection:', error);
-});
-
 console.log('✅ All systems initialized - waiting for events...');
-
-// Add error handling
-server.on('error', (err) => {
-  console.error('❌ Healthcheck server error:', err);
-});
-
-// Now import ElizaOS modules
-import { logger, type IAgentRuntime, type Project, type ProjectAgent } from '@elizaos/core';
-import { character as fsaaCharacter } from './character-fsaa-manager-agent.js';
-import { character as kajgodCharacter } from './character-kajgod-agent.js';
-import { registerSchedulers } from './scheduler.js';
-
-let globalRuntime: IAgentRuntime | null = null;
-let schedulersRegistered = false;
 
 const initCharacter = async ({ runtime, characterName }: { runtime: IAgentRuntime; characterName: string }) => {
   logger.info(`Initializing character: ${characterName}`);
