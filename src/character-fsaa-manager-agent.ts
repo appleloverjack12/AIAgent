@@ -9,6 +9,14 @@ console.log('==============================\n');
 
 export const character: Character = {
   name: 'FSAAManagerAgent',
+  settings: {
+    secrets: {
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    },
+    voice: {
+      model: 'gpt-4o',
+    }
+  },
   
   clients: [{
     type:'telegram',

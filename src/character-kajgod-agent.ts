@@ -9,6 +9,14 @@ console.log('====================================\n');
 
 export const character: Character = {
   name: 'KajgodIntelAgent',
+  settings: {
+    secrets: {
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    },
+    voice: {
+      model: 'gpt-4o',
+    }
+  },
 
   clients: [{
     type: 'telegram',
@@ -21,6 +29,7 @@ export const character: Character = {
 
   plugins: [
     '@elizaos/plugin-sql',
+    '@elizaos/plugin-telegram',
     ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
