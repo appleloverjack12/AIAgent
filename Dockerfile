@@ -4,13 +4,14 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Install WITHOUT running any postinstall scripts (skips Ollama)
+# Install without scripts
 RUN npm install --ignore-scripts
 
-# Copy source
+# Run ONLY bun's postinstall (skip Ollama)
+RUN cd node_modules/bun && node install.js || true
+
 COPY . .
 
-# Build
 RUN npm run build
 
 EXPOSE 3000
