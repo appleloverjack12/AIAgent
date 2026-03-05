@@ -53,11 +53,47 @@ const server = http.createServer((req, res) => {
     res.writeHead(404);
     res.end('Not found');
   }
-});
+
+}
+
+);
 
 server.listen(3000, '0.0.0.0', () => {
   console.log('✅ Healthcheck server listening on port 3000');
 });
+setTimeout(async () => {
+  console.log('🤖 Attempting to initialize Telegram connection...');
+  
+  // Try to send a test message to yourself
+  const fetch = (await import('node-fetch')).default;
+  
+  // Test FSAA bot
+  const fsaaTest = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: process.env.FSAA_CHAT_ID,
+      text: '🤖 Bot is online and connected to Telegram!'
+    })
+  });
+  
+  const fsaaResult = await fsaaTest.json();
+  console.log('FSAA test result:', fsaaResult.ok ? '✅' : '❌', fsaaResult.description || '');
+  
+  // Test Kajgod bot
+  const kajgodTest = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN_KAJGOD}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: process.env.KAJGOD_CHAT_ID,
+      text: '🤖 Bot je online i spojen na Telegram!'
+    })
+  });
+  
+  const kajgodResult = await kajgodTest.json();
+  console.log('Kajgod test result:', kajgodResult.ok ? '✅' : '❌', kajgodResult.description || '');
+  
+}, 5000);
 
 // Add error handling
 server.on('error', (err) => {
