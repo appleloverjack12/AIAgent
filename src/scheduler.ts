@@ -1,12 +1,3 @@
-// Load environment variables
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.join(process.cwd(), '.env') });
-
 import cron from 'node-cron';
 import { logger, type IAgentRuntime } from '@elizaos/core';
 import fetch from 'node-fetch';
@@ -15,6 +6,9 @@ interface TelegramResponse {
   ok: boolean;
   description?: string;
 }
+
+let fsaaLastUpdateId = 0;
+let kajgodLastUpdateId = 0;
 
 async function sendTelegramMessage(token: string, chatId: string, text: string, botName: string): Promise<boolean> {
   try {
@@ -43,6 +37,102 @@ async function sendTelegramMessage(token: string, chatId: string, text: string, 
     logger.error(`❌ [${botName}] Error:`, error);
     return false;
   }
+}
+
+export async function startMessagePolling(runtime: IAgentRuntime) {
+  console.log('📞 Starting Telegram message polling...');
+  
+  const pollMessages = async () => {
+    try {
+      // Poll FSAA bot
+      const fsaaResponse = await fetch(
+        `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getUpdates?offset=${fsaaLastUpdateId + 1}&timeout=10`
+      );
+      const fsaaData = await fsaaResponse.json() as any;
+      
+      if (fsaaData.ok && fsaaData.result.length > 0) {
+        for (const update of fsaaData.result) {
+          fsaaLastUpdateId = update.update_id;
+          
+          if (update.message && update.message.text && !update.message.from.is_bot) {
+            const chatId = update.message.chat.id;
+            const text = update.message.text;
+            
+            console.log(`📨 FSAA received: "${text}"`);
+            
+            // Generate response
+            let response = '';
+            if (text.toLowerCase() === '/briefing') {
+              response = "Generating your FSAA briefing... Please wait while I search the web.";
+            } else if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')) {
+              response = "Hello! I'm the FSAA intelligence agent. Use /briefing to get today's automotive industry briefing.";
+            } else {
+              response = "I'm here to help with FSAA intelligence. Try /briefing for today's report.";
+            }
+            
+            // Send response
+            await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: response
+              })
+            });
+            
+            console.log(`✅ FSAA responded to: "${text}"`);
+          }
+        }
+      }
+      
+      // Poll Kajgod bot
+      const kajgodResponse = await fetch(
+        `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN_KAJGOD}/getUpdates?offset=${kajgodLastUpdateId + 1}&timeout=10`
+      );
+      const kajgodData = await kajgodResponse.json() as any;
+      
+      if (kajgodData.ok && kajgodData.result.length > 0) {
+        for (const update of kajgodData.result) {
+          kajgodLastUpdateId = update.update_id;
+          
+          if (update.message && update.message.text && !update.message.from.is_bot) {
+            const chatId = update.message.chat.id;
+            const text = update.message.text;
+            
+            console.log(`📨 Kajgod received: "${text}"`);
+            
+            // Generate response in Croatian
+            let response = '';
+            if (text.toLowerCase() === '/briefing') {
+              response = "Generiram vaš Kajgod izvještaj... Molim pričekajte.";
+            } else if (text.toLowerCase().includes('bok') || text.toLowerCase().includes('hello')) {
+              response = "Bok! Ja sam Kajgod intel agent. Pošaljite /briefing za današnji poslovni izvještaj.";
+            } else {
+              response = "Kako vam mogu pomoći? Pokušajte /briefing.";
+            }
+            
+            await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN_KAJGOD}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: response
+              })
+            });
+            
+            console.log(`✅ Kajgod responded to: "${text}"`);
+          }
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Polling error:', error);
+    }
+  };
+  
+  // Run immediately and then every 2 seconds
+  await pollMessages();
+  setInterval(pollMessages, 2000);
 }
 
 export function registerSchedulers(runtime: IAgentRuntime) {

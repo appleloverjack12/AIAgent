@@ -62,22 +62,17 @@ server.on('error', (err) => {
   console.error('❌ Healthcheck server error:', err);
 });
 
-// Now import ElizaOS modules (after server setup)
+// Now import ElizaOS modules
 import { logger, type IAgentRuntime, type Project, type ProjectAgent } from '@elizaos/core';
 import { character as fsaaCharacter } from './character-fsaa-manager-agent.js';
 import { character as kajgodCharacter } from './character-kajgod-agent.js';
-import { registerSchedulers } from './scheduler.js';
+import { registerSchedulers, startMessagePolling } from './scheduler.js';
 
-// Declare global variables BEFORE using them
+// Declare global variables
 let globalRuntime: IAgentRuntime | null = null;
 let schedulersRegistered = false;
 
 console.log('🔧 Setting up message handler...');
-
-// This is a hack to force message responses
-process.on('message', (msg) => {
-  console.log('📨 Received message event:', msg);
-});
 
 // Add this to prevent process from exiting
 process.on('uncaughtException', (error) => {
@@ -88,12 +83,11 @@ process.on('unhandledRejection', (error) => {
   console.error('💥 Unhandled Rejection:', error);
 });
 
-// Set up the message polling
+// Set up the connection test
 setTimeout(async () => {
   console.log('🤖 Starting Telegram connection test...');
   
   try {
-    // Dynamic import for node-fetch
     const { default: fetch } = await import('node-fetch');
     
     // Test FSAA bot
@@ -156,7 +150,9 @@ const initCharacter = async ({ runtime, characterName }: { runtime: IAgentRuntim
     setTimeout(() => {
       try {
         registerSchedulers(runtime);
-        logger.info('✅ Schedulers registered successfully');
+        // Start message polling after schedulers are registered
+        startMessagePolling(runtime);
+        logger.info('✅ Schedulers registered and message polling started');
       } catch (error) {
         logger.error('Failed to register schedulers:', error);
         schedulersRegistered = false;
