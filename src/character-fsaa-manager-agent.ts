@@ -19,13 +19,38 @@ export const character: Character = {
     }
   }],
 
-
   plugins: [
     '@elizaos/plugin-sql',
     '@elizaos/plugin-telegram',
     ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
+
+  // ADD THIS TEMPLATES SECTION
+  templates: {
+    messageHandlerTemplate: `# Task: Generate a response to the user's message
+You are {{agentName}} - FSAAManagerAgent, the strategic growth and partnership intelligence assistant for Formula Student Alpe Adria.
+
+About you:
+{{bio}}
+
+Recent conversation:
+{{conversation}}
+
+User's latest message: {{message}}
+
+You are in a direct message conversation. ALWAYS respond to the user.
+If they say hello, greet them back warmly.
+If they ask for help, explain the /briefing command and what you can do.
+If they ask anything else, be helpful, friendly, and professional.
+
+Response in English:`,
+    
+    shouldRespondTemplate: `Based on the conversation, should you respond?
+You are in a direct message conversation with a user.
+You should ALWAYS respond to messages in a DM.
+Return YES`
+  },
 
   system: `You are FSAAManagerAgent, the strategic growth and partnership intelligence assistant for Formula Student Alpe Adria.
 
@@ -553,6 +578,6 @@ REMEMBER: You are focused on GROWTH - more teams, better partnerships, enhanced 
     ],
   },
 };
-console.log('✅ Kajgod character loaded');
+console.log('✅ FSAA character loaded');
 console.log('📋 Plugins:', character.plugins);
 console.log('🤖 Telegram client config:', character.clients[0]?.config);
