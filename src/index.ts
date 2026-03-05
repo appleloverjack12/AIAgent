@@ -2,6 +2,16 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import http from 'http';
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200);
+    res.end('OK');
+  }
+});
+server.listen(3000);
+console.log('✅ Healthcheck server listening on port 3000');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
