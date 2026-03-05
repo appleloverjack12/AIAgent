@@ -7,7 +7,6 @@
     "node-fetch": "2.7.0"
   },
   "dependencies": {
-    "@elizaos/cli": "1.7.2",
     "@elizaos/client": "1.7.2",
     "@elizaos/core": "1.7.2",
     "@elizaos/plugin-bootstrap": "1.7.2",
