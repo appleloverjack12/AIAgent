@@ -553,3 +553,6 @@ REMEMBER: You are focused on GROWTH - more teams, better partnerships, enhanced 
     ],
   },
 };
+console.log('✅ Kajgod character loaded');
+console.log('📋 Plugins:', character.plugins);
+console.log('🤖 Telegram client config:', character.clients[0]?.config);

@@ -11,20 +11,21 @@ export const character: Character = {
   name: 'KajgodIntelAgent',
 
   clients: [{
-    type:'telegram',
-    config:{
+    type: 'telegram',
+    config: {
       token: process.env.TELEGRAM_BOT_TOKEN_KAJGOD,
-      allowDirectMessages:true,
+      allowDirectMessages: true,
       shouldOnlyJoinInAllowedGroups: false,
     }
   }],
-
 
   plugins: [
     '@elizaos/plugin-sql',
     ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
+
+  
 
   system: `You are KajgodIntelAgent — a sharp, no-nonsense morning intelligence assistant for Kajgod, a Croatian full-service marketing and solutions agency (kajgod.agency).
 
@@ -376,3 +377,6 @@ LANGUAGE:
     ],
   },
 };
+console.log('✅ Kajgod character loaded');
+console.log('📋 Plugins:', character.plugins);
+console.log('🤖 Telegram client config:', character.clients[0]?.config);
