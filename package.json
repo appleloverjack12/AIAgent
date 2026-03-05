@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
-  "engines": {
-    "node": "18.x"
-  },
   "overrides": {
     "node-fetch": "2.7.0"
   },
@@ -18,7 +15,6 @@
     "@elizaos/plugin-telegram": "^1.6.4",
     "@elizaos/server": "1.7.2",
     "node-cron": "^4.2.1",
-    "node-fetch": "2.7.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
@@ -28,14 +24,9 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "elizaos start",
+    "start": "node dist/index.js",
     "build": "tsc",
-    "railway-build": "tsc",
-    "start:production": "elizaos start"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/appleloverjack12/AIAgent.git"
+    "start:production": "node dist/index.js"
   },
   "private": true
 }

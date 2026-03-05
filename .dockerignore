@@ -1,29 +1,12 @@
-# Dependencies
+notepad .dockerignore
+```
+
+Replace everything with:
+```
 node_modules
-bun.lockb
-yarn.lock
-pnpm-lock.yaml
-
-# Environment files
-.env
-.env.*
-
-# Git
-.git
-.github
-
-# Logs
-logs
-*.log
-
-# IDE
-.vscode
-.idea
-.DS_Store
-
-# Build output
 dist
-
-# Cache
+.git
+.env
+*.log
 .cache
 .eliza

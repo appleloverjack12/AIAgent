@@ -1,0 +1,21 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies, skipping optional (Ollama)
+RUN npm ci --omit=optional || npm install --omit=optional
+
+# Copy source code
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Start the app
+CMD ["npm", "start"]
