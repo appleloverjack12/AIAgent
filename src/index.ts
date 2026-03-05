@@ -14,7 +14,7 @@ console.log('📂 Current directory:', process.cwd());
 console.log('='.repeat(80));
 
 // Import required modules
-import * as dotenv from 'dotenv';
+//import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
@@ -25,14 +25,9 @@ const __dirname = path.dirname(__filename);
 // Load .env from the correct path
 const envPath = path.join(process.cwd(), '.env');
 console.log('📁 Loading .env from:', envPath);
-const result = dotenv.config({ path: envPath });
+//const result = dotenv.config({ path: envPath });
 
-if (result.error) {
-  console.error('❌ Failed to load .env file:', result.error.message);
-  console.log('Current working directory:', process.cwd());
-} else {
-  console.log('✅ Environment variables loaded successfully');
-}
+
 
 // Debug environment variables (without exposing full tokens)
 console.log('🔍 ENVIRONMENT CHECK:');
