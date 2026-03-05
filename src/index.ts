@@ -29,7 +29,7 @@ console.log('📁 Loading .env from:', envPath);
 
 
 
-// Debug environment variables (without exposing full tokens)
+// Debug environment variables
 console.log('🔍 ENVIRONMENT CHECK:');
 console.log('TELEGRAM_BOT_TOKEN exists:', !!process.env.TELEGRAM_BOT_TOKEN);
 console.log('TELEGRAM_BOT_TOKEN length:', process.env.TELEGRAM_BOT_TOKEN?.length || 0);
