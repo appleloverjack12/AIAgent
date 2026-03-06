@@ -35,12 +35,45 @@ export class CustomTelegramClient {
 
   async webSearch(query: string): Promise<string> {
     try {
-      // Use brave search or google - adjust based on your preference
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-      logger.info(`🔍 Searching web for: ${query}`);
+      if (!process.env.BRAVE_API_KEY) {
+        logger.warn('BRAVE_API_KEY not set');
+        return '';
+      }
+
+      logger.info(`🔍 Searching web: ${query}`);
       
-      // For now, indicate that search would happen
-      return `[Web search results for: ${query}]`;
+      const response = await fetch(
+        `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=5&text_decorations=false&search_lang=hr`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'X-Subscription-Token': process.env.BRAVE_API_KEY
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        logger.error(`Brave API error: ${response.status}`);
+        return '';
+      }
+      
+      const data: any = await response.json();
+      const results = data.web?.results || [];
+      
+      if (results.length === 0) {
+        return 'Nema pronađenih rezultata.';
+      }
+      
+      const formattedResults = results
+        .slice(0, 5)
+        .map((r: any, i: number) => 
+          `[${i + 1}] ${r.title}\n${r.description}\nIzvor: ${r.url}\n`
+        )
+        .join('\n');
+        
+      logger.info(`✅ Found ${results.length} search results`);
+      return `NAJNOVIJE VIJESTI S WEBA:\n\n${formattedResults}`;
+      
     } catch (error) {
       logger.error('Web search error:', error);
       return '';
@@ -49,29 +82,23 @@ export class CustomTelegramClient {
 
   async generateResponse(userMessage: string): Promise<string> {
     try {
-      // Check if we need web search
-      const needsSearch = userMessage.toLowerCase().includes('vijesti') || 
-                         userMessage.toLowerCase().includes('danas') ||
-                         userMessage.toLowerCase().includes('briefing');
+      logger.info(`📨 Processing: ${userMessage}`);
+      
+      const searchContext = await this.webSearch(userMessage);
 
-      let searchContext = '';
-      if (needsSearch) {
-        searchContext = await this.webSearch(userMessage);
-      }
-
-      // Build system prompt with character data
       const systemPrompt = `Ime: ${this.character.name}
 
 Bio: ${this.character.bio?.join('\n') || ''}
 
 Znanje: ${this.character.knowledge?.join('\n') || ''}
 
-Stil odgovaranja: ${this.character.style?.all?.join(', ') || ''}
-${this.character.style?.chat?.join(', ') || ''}
+Stil: ${this.character.style?.all?.join(', ') || ''}
 
-${searchContext ? `Koristi ove web search rezultate: ${searchContext}` : ''}
+VAŽNO: Danas je ${new Date().toLocaleDateString('hr-HR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.
 
-Odgovaraj u skladu sa svojim karakterom i znanjem. Ako tražiš najnovije informacije, koristi web search.`;
+${searchContext ? `\n=== NAJNOVIJI WEB REZULTATI ===\n${searchContext}\n\nKoristi OVE PRAVE informacije u svom odgovoru. NE izmišljaj podatke!\n` : ''}
+
+Odgovaraj u skladu sa svojim karakterom koristeći SAMO informacije iz web rezultata gore.`;
 
       const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -86,15 +113,22 @@ Odgovaraj u skladu sa svojim karakterom i znanjem. Ako tražiš najnovije inform
             { role: 'user', content: userMessage }
           ],
           temperature: 0.7,
-          max_tokens: 1000
+          max_tokens: 2000
         })
       });
 
       const data: any = await openaiResponse.json();
+      
+      if (data.error) {
+        logger.error('OpenAI error:', data.error);
+        return `Greška: ${data.error.message}`;
+      }
+      
       return data.choices?.[0]?.message?.content || "Nisam mogao generirati odgovor.";
+      
     } catch (error) {
-      logger.error('OpenAI error:', error);
-      return "Oprosti, došlo je do greške.";
+      logger.error('Response generation error:', error);
+      return "Oprosti, došlo je do greške pri generiranju odgovora.";
     }
   }
 
