@@ -4,20 +4,13 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 
+# Install without scripts
 RUN npm install --ignore-scripts
 
-# Delete ALL node-fetch v3 instances - be more aggressive
-RUN find node_modules -type f -name "package.json" -path "*/node-fetch/*" -exec sh -c 'dir=$(dirname "{}"); rm -rf "$dir"' \;
+# FORCE node-fetch v2 (override telegraf's v3)
+RUN npm install node-fetch@2.7.0 --save --legacy-peer-deps
 
-# Install v2 globally
-RUN npm install node-fetch@2.7.0 --legacy-peer-deps
-
-# ALSO patch it directly into telegraf if it exists
-RUN if [ -d "node_modules/telegraf/node_modules" ]; then \
-      cd node_modules/telegraf && \
-      npm install node-fetch@2.7.0 --legacy-peer-deps --no-save; \
-    fi
-
+# Run bun postinstall
 RUN cd node_modules/bun && node install.js || true
 
 COPY . .
