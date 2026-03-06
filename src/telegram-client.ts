@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { logger, type IAgentRuntime } from '@elizaos/core';
+import { logger, type IAgentRuntime, type Character } from '@elizaos/core';
 
 interface TelegramUpdate {
   update_id: number;
@@ -14,14 +14,14 @@ interface TelegramUpdate {
 export class CustomTelegramClient {
   private token: string;
   private runtime: IAgentRuntime;
+  private character: Character;
   private offset: number = 0;
   private polling: boolean = false;
-  private characterName: string;
 
-  constructor(token: string, runtime: IAgentRuntime, characterName: string) {
+  constructor(token: string, runtime: IAgentRuntime, character: Character) {
     this.token = token;
     this.runtime = runtime;
-    this.characterName = characterName;
+    this.character = character;
   }
 
   async sendMessage(chatId: number, text: string) {
@@ -33,17 +33,46 @@ export class CustomTelegramClient {
     return response.json();
   }
 
-  async getUpdates(): Promise<TelegramUpdate[]> {
-    const response = await fetch(
-      `https://api.telegram.org/bot${this.token}/getUpdates?offset=${this.offset}&timeout=30`
-    );
-    const data: any = await response.json();
-    return data.result || [];
+  async webSearch(query: string): Promise<string> {
+    try {
+      // Use brave search or google - adjust based on your preference
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      logger.info(`🔍 Searching web for: ${query}`);
+      
+      // For now, indicate that search would happen
+      return `[Web search results for: ${query}]`;
+    } catch (error) {
+      logger.error('Web search error:', error);
+      return '';
+    }
   }
 
   async generateResponse(userMessage: string): Promise<string> {
     try {
-      // Use OpenAI directly
+      // Check if we need web search
+      const needsSearch = userMessage.toLowerCase().includes('vijesti') || 
+                         userMessage.toLowerCase().includes('danas') ||
+                         userMessage.toLowerCase().includes('briefing');
+
+      let searchContext = '';
+      if (needsSearch) {
+        searchContext = await this.webSearch(userMessage);
+      }
+
+      // Build system prompt with character data
+      const systemPrompt = `Ime: ${this.character.name}
+
+Bio: ${this.character.bio?.join('\n') || ''}
+
+Znanje: ${this.character.knowledge?.join('\n') || ''}
+
+Stil odgovaranja: ${this.character.style?.all?.join(', ') || ''}
+${this.character.style?.chat?.join(', ') || ''}
+
+${searchContext ? `Koristi ove web search rezultate: ${searchContext}` : ''}
+
+Odgovaraj u skladu sa svojim karakterom i znanjem. Ako tražiš najnovije informacije, koristi web search.`;
+
       const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -53,33 +82,43 @@ export class CustomTelegramClient {
         body: JSON.stringify({
           model: 'gpt-4o',
           messages: [
-            { role: 'system', content: `You are ${this.characterName}. Respond helpfully.` },
+            { role: 'system', content: systemPrompt },
             { role: 'user', content: userMessage }
-          ]
+          ],
+          temperature: 0.7,
+          max_tokens: 1000
         })
       });
 
       const data: any = await openaiResponse.json();
-      return data.choices?.[0]?.message?.content || "I couldn't generate a response.";
+      return data.choices?.[0]?.message?.content || "Nisam mogao generirati odgovor.";
     } catch (error) {
       logger.error('OpenAI error:', error);
-      return "Sorry, I encountered an error.";
+      return "Oprosti, došlo je do greške.";
     }
+  }
+
+  async getUpdates(): Promise<TelegramUpdate[]> {
+    const response = await fetch(
+      `https://api.telegram.org/bot${this.token}/getUpdates?offset=${this.offset}&timeout=30`
+    );
+    const data: any = await response.json();
+    return data.result || [];
   }
 
   async handleMessage(message: TelegramUpdate['message']) {
     if (!message?.text) return;
 
-    logger.info(`[${this.characterName}] Received: ${message.text} from ${message.from.first_name}`);
+    logger.info(`[${this.character.name}] Primio: ${message.text}`);
 
     const response = await this.generateResponse(message.text);
     await this.sendMessage(message.chat.id, response);
-    logger.info(`[${this.characterName}] ✅ Sent response`);
+    logger.info(`[${this.character.name}] ✅ Poslao odgovor`);
   }
 
   startPolling() {
     this.polling = true;
-    logger.info(`✅ ${this.characterName} Telegram client started`);
+    logger.info(`✅ ${this.character.name} Telegram klijent pokrenut`);
 
     const poll = async () => {
       while (this.polling) {
@@ -93,7 +132,7 @@ export class CustomTelegramClient {
             }
           }
         } catch (error) {
-          logger.error(`[${this.characterName}] Polling error:`, error);
+          logger.error(`[${this.character.name}] Greška:`, error);
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
       }

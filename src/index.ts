@@ -10,17 +10,14 @@ let schedulersRegistered = false;
 const initCharacter = async ({ runtime, characterName }: { runtime: IAgentRuntime; characterName: string }) => {
   logger.info(`Initializing character: ${characterName}`);
   
-  // Start Telegram client for THIS character
   if (characterName === 'FSAAManagerAgent' && process.env.TELEGRAM_BOT_TOKEN) {
-    const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN, runtime, 'FSAA');
+    const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN, runtime, fsaaCharacter);
     client.startPolling();
-    logger.info('✅ FSAA Telegram client started');
   }
   
   if (characterName === 'KajgodIntelAgent' && process.env.TELEGRAM_BOT_TOKEN_KAJGOD) {
-    const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN_KAJGOD, runtime, 'Kajgod');
+    const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN_KAJGOD, runtime, kajgodCharacter);
     client.startPolling();
-    logger.info('✅ Kajgod Telegram client started');
   }
   
   // Only set globalRuntime and schedulers ONCE
