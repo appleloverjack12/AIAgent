@@ -44,16 +44,29 @@ export class CustomTelegramClient {
 
     logger.info(`Received: ${message.text} from ${message.from.first_name}`);
 
-    // Generate response using OpenAI
-    const response = await this.runtime.processMessage({
-      content: { text: message.text },
-      userId: message.from.id.toString(),
-      roomId: message.chat.id.toString(),
-    });
+    try {
+      // Use ElizaOS completion generation
+      const response = await this.runtime.completion({
+        context: message.text,
+        stop: ['\n'],
+      });
 
-    if (response) {
-      await this.sendMessage(message.chat.id, response);
+      if (response) {
+        await this.sendMessage(message.chat.id, response);
+        logger.info(`✅ Sent response to ${message.from.first_name}`);
+      }
+    } catch (error) {
+      logger.error('Error generating response:', error);
+      await this.sendMessage(message.chat.id, "Sorry, I encountered an error processing your message.");
     }
+  }
+
+  async getUpdates(): Promise<TelegramUpdate[]> {
+    const response = await fetch(
+      `https://api.telegram.org/bot${this.token}/getUpdates?offset=${this.offset}&timeout=30`
+    );
+    const data: any = await response.json();
+    return data.result || [];
   }
 
   startPolling() {
