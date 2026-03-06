@@ -45,7 +45,6 @@ export class CustomTelegramClient {
     logger.info(`Received: ${message.text} from ${message.from.first_name}`);
 
     try {
-      // Use ElizaOS completion generation
       const response = await this.runtime.completion({
         context: message.text,
         stop: ['\n'],
@@ -57,16 +56,8 @@ export class CustomTelegramClient {
       }
     } catch (error) {
       logger.error('Error generating response:', error);
-      await this.sendMessage(message.chat.id, "Sorry, I encountered an error processing your message.");
+      await this.sendMessage(message.chat.id, "Sorry, I encountered an error.");
     }
-  }
-
-  async getUpdates(): Promise<TelegramUpdate[]> {
-    const response = await fetch(
-      `https://api.telegram.org/bot${this.token}/getUpdates?offset=${this.offset}&timeout=30`
-    );
-    const data: any = await response.json();
-    return data.result || [];
   }
 
   startPolling() {
