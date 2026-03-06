@@ -25,18 +25,19 @@ export class CustomTelegramClient {
   }
 
   private getBriefingQuery(): string {
-    if (this.character.name === 'FSAAManagerAgent') {
-      const today = new Date().toISOString().split('T')[0];
-      return `automotive industry news ${today} OR Formula Student latest OR car manufacturer partnerships OR automotive sponsorship`;
-    }
-    
-    if (this.character.name === 'KajgodIntelAgent') {
-      const today = new Date().toISOString().split('T')[0];
-      return `event management Croatia Slovenia Austria ${today} OR marketing events Zagreb Ljubljana Vienna OR sponzorstvo događaji ${today} OR business events Balkan`;
-    }
-    
-    return 'latest news today';
+  if (this.character.name === 'FSAAManagerAgent') {
+    const today = new Date().toISOString().split('T')[0];
+    return `automotive industry news ${today} Formula Student sponsorship opportunities car manufacturer partnerships automotive events`;
   }
+  
+  if (this.character.name === 'KajgodIntelAgent') {
+    const today = new Date().toISOString().split('T')[0];
+    // Broader search - include general business and event news
+    return `Croatia business news ${today} Slovenia startup funding Austria marketing events corporate events Zagreb Vienna Ljubljana new companies advertising agencies event production`;
+  }
+  
+  return 'latest news today';
+}
 
   async sendMessage(chatId: number, text: string) {
     const response = await fetch(`https://api.telegram.org/bot${this.token}/sendMessage`, {
@@ -93,6 +94,66 @@ export class CustomTelegramClient {
       return '';
     }
   }
+  async findContactInfo(companyName: string, websiteUrl?: string): Promise<string> {
+  try {
+    // Search for contact information
+    const contactQuery = `${companyName} contact email phone LinkedIn`;
+    logger.info(`📧 Searching contacts for: ${companyName}`);
+    
+    const response = await fetch(
+      `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(contactQuery)}&count=3`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'X-Subscription-Token': process.env.BRAVE_API_KEY || ''
+        }
+      }
+    );
+    
+    if (!response.ok) return '';
+    
+    const data: any = await response.json();
+    const results = data.web?.results || [];
+    
+    // Extract contact information from results
+    const contactInfo: string[] = [];
+    
+    for (const result of results) {
+      const text = `${result.title} ${result.description}`.toLowerCase();
+      
+      // Look for email patterns
+      const emailMatch = text.match(/[\w.-]+@[\w.-]+\.\w+/g);
+      if (emailMatch) {
+        contactInfo.push(`Email: ${emailMatch[0]}`);
+      }
+      
+      // Look for phone patterns
+      const phoneMatch = text.match(/\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}/g);
+      if (phoneMatch) {
+        contactInfo.push(`Phone: ${phoneMatch[0]}`);
+      }
+      
+      // Look for LinkedIn
+      if (text.includes('linkedin.com')) {
+        const linkedinMatch = result.url?.match(/linkedin\.com\/company\/[\w-]+/);
+        if (linkedinMatch) {
+          contactInfo.push(`LinkedIn: https://${linkedinMatch[0]}`);
+        }
+      }
+      
+      // Add website if found
+      if (result.url && !contactInfo.some(c => c.includes('Website'))) {
+        contactInfo.push(`Website: ${result.url}`);
+      }
+    }
+    
+    return contactInfo.length > 0 ? contactInfo.slice(0, 3).join(', ') : '';
+    
+  } catch (error) {
+    logger.error('Contact search error:', error);
+    return '';
+  }
+}
 
   async generateResponse(userMessage: string): Promise<string> {
     try {
@@ -124,18 +185,37 @@ JEZIK ODGOVORA: UVIJEK odgovaraj na ${responseLanguage} jeziku!
 
 VAŽNO: Danas je ${new Date().toLocaleDateString('hr-HR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.
 
-${searchContext ? `\n=== NAJNOVIJI WEB REZULTATI ===\n${searchContext}\n\nKoristi OVE PRAVE informacije. Analiziraj rezultate i izvuci KONKRETNE prilike, podatke o tvrtkama, događajima.\n` : ''}
+${searchContext ? `\n=== NAJNOVIJI WEB REZULTATI ===\n${searchContext}\n\nKoristi OVE PRAVE informacije. Analiziraj rezultate i izvuci:
+- KONKRETNE tvrtke, proizvode, događaje
+- KONTAKT INFORMACIJE (emailove, telefone, web stranice, LinkedIn profile)
+- Imena osoba za kontakt (CEO, Marketing Director, Event Manager)
+\n` : ''}
 
 ${isBriefing ? `\nOVO JE BRIEFING REQUEST. Formatiraj odgovor na ${responseLanguage} jeziku kao profesionalni izvještaj s:
-- **Najnovije vijesti** relevantne za ${this.character.name}
-- **Prilike** (novi partneri, događaji, natječaji)
-- **Akcije** (konkretni sljedeći koraci)
-- **Važni datumi** ako postoje
 
-Koristi **bold** za naslove sekcija.\n` : ''}
+**Najnovije vijesti** relevantne za ${this.character.name}
+- Za SVAKU vijest navedi ime tvrtke/osobe
+- Za SVAKU priliku izvuci i prikaži KONTAKT INFORMACIJE (email, telefon, LinkedIn, website)
 
-PONOVI: Odgovaraj ISKLJUČIVO na ${responseLanguage} jeziku koristeći informacije iz web rezultata.`;
+**Prilike** (novi partneri, događaji, natječaji)
+- Konkretne tvrtke koje traže partnere
+- KONTAKT OSOBE i njihovi podaci (ime, pozicija, email, LinkedIn)
 
+**Akcije** (konkretni sljedeći koraci)
+- Za SVAKU akciju navedi KONKRETNU OSOBU ili tvrtku za kontaktirati
+- Navedi KAKO ih kontaktirati (email, LinkedIn message, phone)
+
+**Važni datumi** ako postoje
+
+OBAVEZNO: Za SVAKU priliku ili tvrtku spomenutu u izvještaju pokušaj pronaći i navesti:
+- 📧 Email kontakt
+- 📞 Telefon (ako postoji)
+- 🔗 LinkedIn profil (osobe ili tvrtke)
+- 🌐 Website
+
+Koristi **bold** za naslove sekcija i 📧📞🔗🌐 emoji za kontakt informacije.\n` : ''}
+
+PONOVI: Odgovaraj ISKLJUČIVO na ${responseLanguage} jeziku koristeći informacije iz web rezultata. OBAVEZNO uključi kontakt informacije gdje god je moguće!`;
       const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
