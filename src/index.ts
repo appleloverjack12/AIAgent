@@ -10,22 +10,23 @@ let schedulersRegistered = false;
 const initCharacter = async ({ runtime, characterName }: { runtime: IAgentRuntime; characterName: string }) => {
   logger.info(`Initializing character: ${characterName}`);
   
+  // Start Telegram client for THIS character
+  if (characterName === 'FSAAManagerAgent' && process.env.TELEGRAM_BOT_TOKEN) {
+    const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN, runtime, 'FSAA');
+    client.startPolling();
+    logger.info('✅ FSAA Telegram client started');
+  }
+  
+  if (characterName === 'KajgodIntelAgent' && process.env.TELEGRAM_BOT_TOKEN_KAJGOD) {
+    const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN_KAJGOD, runtime, 'Kajgod');
+    client.startPolling();
+    logger.info('✅ Kajgod Telegram client started');
+  }
+  
+  // Only set globalRuntime and schedulers ONCE
   if (!globalRuntime) {
     globalRuntime = runtime;
     logger.info('Runtime stored');
-    
-    // Start custom Telegram clients
-    if (characterName === 'FSAAManagerAgent' && process.env.TELEGRAM_BOT_TOKEN) {
-      const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN, runtime);
-      client.startPolling();
-      logger.info('✅ FSAA Telegram client started');
-    }
-    
-    if (characterName === 'KajgodIntelAgent' && process.env.TELEGRAM_BOT_TOKEN_KAJGOD) {
-      const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN_KAJGOD, runtime);
-      client.startPolling();
-      logger.info('✅ Kajgod Telegram client started');
-    }
   }
   
   if (!schedulersRegistered) {

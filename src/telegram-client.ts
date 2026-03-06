@@ -16,10 +16,12 @@ export class CustomTelegramClient {
   private runtime: IAgentRuntime;
   private offset: number = 0;
   private polling: boolean = false;
+  private characterName: string;
 
-  constructor(token: string, runtime: IAgentRuntime) {
+  constructor(token: string, runtime: IAgentRuntime, characterName: string) {
     this.token = token;
     this.runtime = runtime;
+    this.characterName = characterName;
   }
 
   async sendMessage(chatId: number, text: string) {
@@ -39,30 +41,45 @@ export class CustomTelegramClient {
     return data.result || [];
   }
 
+  async generateResponse(userMessage: string): Promise<string> {
+    try {
+      // Use OpenAI directly
+      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            { role: 'system', content: `You are ${this.characterName}. Respond helpfully.` },
+            { role: 'user', content: userMessage }
+          ]
+        })
+      });
+
+      const data: any = await openaiResponse.json();
+      return data.choices?.[0]?.message?.content || "I couldn't generate a response.";
+    } catch (error) {
+      logger.error('OpenAI error:', error);
+      return "Sorry, I encountered an error.";
+    }
+  }
+
   async handleMessage(message: TelegramUpdate['message']) {
     if (!message?.text) return;
 
-    logger.info(`Received: ${message.text} from ${message.from.first_name}`);
+    logger.info(`[${this.characterName}] Received: ${message.text} from ${message.from.first_name}`);
 
-    try {
-      const response = await this.runtime.completion({
-        context: message.text,
-        stop: ['\n'],
-      });
-
-      if (response) {
-        await this.sendMessage(message.chat.id, response);
-        logger.info(`✅ Sent response to ${message.from.first_name}`);
-      }
-    } catch (error) {
-      logger.error('Error generating response:', error);
-      await this.sendMessage(message.chat.id, "Sorry, I encountered an error.");
-    }
+    const response = await this.generateResponse(message.text);
+    await this.sendMessage(message.chat.id, response);
+    logger.info(`[${this.characterName}] ✅ Sent response`);
   }
 
   startPolling() {
     this.polling = true;
-    logger.info('✅ Custom Telegram client started');
+    logger.info(`✅ ${this.characterName} Telegram client started`);
 
     const poll = async () => {
       while (this.polling) {
@@ -76,7 +93,7 @@ export class CustomTelegramClient {
             }
           }
         } catch (error) {
-          logger.error('Polling error:', error);
+          logger.error(`[${this.characterName}] Polling error:`, error);
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
       }
