@@ -24,6 +24,20 @@ export class CustomTelegramClient {
     this.character = character;
   }
 
+  private getBriefingQuery(): string {
+    if (this.character.name === 'FSAAManagerAgent') {
+      const today = new Date().toISOString().split('T')[0];
+      return `automotive industry news ${today} OR Formula Student latest OR car manufacturer partnerships OR automotive sponsorship`;
+    }
+    
+    if (this.character.name === 'KajgodIntelAgent') {
+      const today = new Date().toISOString().split('T')[0];
+      return `event management Croatia Slovenia Austria ${today} OR marketing events Zagreb Ljubljana Vienna OR sponzorstvo događaji ${today} OR business events Balkan`;
+    }
+    
+    return 'latest news today';
+  }
+
   async sendMessage(chatId: number, text: string) {
     const response = await fetch(`https://api.telegram.org/bot${this.token}/sendMessage`, {
       method: 'POST',
@@ -43,7 +57,7 @@ export class CustomTelegramClient {
       logger.info(`🔍 Searching web: ${query}`);
       
       const response = await fetch(
-        `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=5&text_decorations=false&search_lang=hr`,
+        `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=10&text_decorations=false`,
         {
           headers: {
             'Accept': 'application/json',
@@ -65,7 +79,7 @@ export class CustomTelegramClient {
       }
       
       const formattedResults = results
-        .slice(0, 5)
+        .slice(0, 10)
         .map((r: any, i: number) => 
           `[${i + 1}] ${r.title}\n${r.description}\nIzvor: ${r.url}\n`
         )
@@ -84,7 +98,19 @@ export class CustomTelegramClient {
     try {
       logger.info(`📨 Processing: ${userMessage}`);
       
-      const searchContext = await this.webSearch(userMessage);
+      const responseLanguage = this.character.name === 'FSAAManagerAgent' ? 'English' : 'Croatian';
+      
+      let searchQuery = userMessage;
+      const isBriefing = userMessage.toLowerCase().includes('/briefing') || 
+                         userMessage.toLowerCase().includes('briefing') ||
+                         userMessage.toLowerCase().includes('izvještaj');
+      
+      if (isBriefing) {
+        searchQuery = this.getBriefingQuery();
+        logger.info(`🎯 Briefing detected, searching: ${searchQuery}`);
+      }
+      
+      const searchContext = await this.webSearch(searchQuery);
 
       const systemPrompt = `Ime: ${this.character.name}
 
@@ -94,11 +120,21 @@ Znanje: ${this.character.knowledge?.join('\n') || ''}
 
 Stil: ${this.character.style?.all?.join(', ') || ''}
 
+JEZIK ODGOVORA: UVIJEK odgovaraj na ${responseLanguage} jeziku!
+
 VAŽNO: Danas je ${new Date().toLocaleDateString('hr-HR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.
 
-${searchContext ? `\n=== NAJNOVIJI WEB REZULTATI ===\n${searchContext}\n\nKoristi OVE PRAVE informacije u svom odgovoru. NE izmišljaj podatke!\n` : ''}
+${searchContext ? `\n=== NAJNOVIJI WEB REZULTATI ===\n${searchContext}\n\nKoristi OVE PRAVE informacije. Analiziraj rezultate i izvuci KONKRETNE prilike, podatke o tvrtkama, događajima.\n` : ''}
 
-Odgovaraj u skladu sa svojim karakterom koristeći SAMO informacije iz web rezultata gore.`;
+${isBriefing ? `\nOVO JE BRIEFING REQUEST. Formatiraj odgovor na ${responseLanguage} jeziku kao profesionalni izvještaj s:
+- **Najnovije vijesti** relevantne za ${this.character.name}
+- **Prilike** (novi partneri, događaji, natječaji)
+- **Akcije** (konkretni sljedeći koraci)
+- **Važni datumi** ako postoje
+
+Koristi **bold** za naslove sekcija.\n` : ''}
+
+PONOVI: Odgovaraj ISKLJUČIVO na ${responseLanguage} jeziku koristeći informacije iz web rezultata.`;
 
       const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -110,7 +146,7 @@ Odgovaraj u skladu sa svojim karakterom koristeći SAMO informacije iz web rezul
           model: 'gpt-4o',
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMessage }
+            { role: 'user', content: isBriefing ? 'Generate today\'s briefing with the latest information.' : userMessage }
           ],
           temperature: 0.7,
           max_tokens: 2000
