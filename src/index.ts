@@ -2,6 +2,7 @@ import { logger, type IAgentRuntime, type Project, type ProjectAgent } from '@el
 import { character as fsaaCharacter } from './character-fsaa-manager-agent.js';
 import { character as kajgodCharacter } from './character-kajgod-agent.js';
 import { registerSchedulers } from './scheduler.js';
+import { CustomTelegramClient } from './telegram-client.js';
 
 let globalRuntime: IAgentRuntime | null = null;
 let schedulersRegistered = false;
@@ -12,6 +13,19 @@ const initCharacter = async ({ runtime, characterName }: { runtime: IAgentRuntim
   if (!globalRuntime) {
     globalRuntime = runtime;
     logger.info('Runtime stored');
+    
+    // Start custom Telegram clients
+    if (characterName === 'FSAAManagerAgent' && process.env.TELEGRAM_BOT_TOKEN) {
+      const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN, runtime);
+      client.startPolling();
+      logger.info('✅ FSAA Telegram client started');
+    }
+    
+    if (characterName === 'KajgodIntelAgent' && process.env.TELEGRAM_BOT_TOKEN_KAJGOD) {
+      const client = new CustomTelegramClient(process.env.TELEGRAM_BOT_TOKEN_KAJGOD, runtime);
+      client.startPolling();
+      logger.info('✅ Kajgod Telegram client started');
+    }
   }
   
   if (!schedulersRegistered) {
