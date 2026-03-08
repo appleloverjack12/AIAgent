@@ -115,7 +115,7 @@ export function registerSchedulers(runtime: IAgentRuntime) {
   logger.info('📅 Registering schedulers...');
 
   // FSAA briefing at 8 AM daily
-  cron.schedule('0 8 * * *', async () => {
+  cron.schedule('* * * * *', async () => {
     logger.info('⏰ FSAA 8 AM briefing triggered');
     
     const briefing = await generateBriefing('FSAA');
@@ -139,7 +139,7 @@ export function registerSchedulers(runtime: IAgentRuntime) {
   });
 
   // Kajgod briefing at 8 AM daily
-  cron.schedule('0 8 * * *', async () => {
+  cron.schedule('* * * * *', async () => {
     logger.info('⏰ Kajgod 8 AM briefing triggered');
     
     const briefing = await generateBriefing('Kajgod');
