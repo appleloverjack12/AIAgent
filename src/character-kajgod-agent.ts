@@ -5,11 +5,6 @@ export const character: Character = {
   secrets: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY, 
   },
-  voice: {
-    model: 'gpt-4o',
-  },
-  model: 'gpt-4o',
-  embeddingModel:'text-embedding-3-small'
 },
 
   plugins: [
