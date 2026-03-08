@@ -9,7 +9,6 @@
     "@elizaos/core": "1.7.2",
     "@elizaos/plugin-bootstrap": "1.7.2",
     "@elizaos/plugin-sql": "1.7.2",
-    "@elizaos/plugin-openai": "1.7.2",
     "@elizaos/server": "1.7.2",
     "node-cron": "^4.2.1",
     "uuid": "^10.0.0"
