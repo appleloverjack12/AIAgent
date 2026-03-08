@@ -1,12 +1,5 @@
 import { type Character } from '@elizaos/core';
 
-console.log('TEST_VAR:', process.env.TEST_VAR);
-console.log('\n=== FSAA ENVIRONMENT DEBUG ===');
-console.log('TELEGRAM_BOT_TOKEN exists:', !!process.env.TELEGRAM_BOT_TOKEN);
-console.log('TELEGRAM_BOT_TOKEN length:', process.env.TELEGRAM_BOT_TOKEN?.length || 0);
-console.log('TELEGRAM_BOT_TOKEN first 10 chars:', process.env.TELEGRAM_BOT_TOKEN?.substring(0, 10) || 'MISSING');
-console.log('==============================\n');
-
 export const character: Character = {
   name: 'FSAAManagerAgent',
   settings: {
@@ -586,6 +579,3 @@ REMEMBER: You are focused on GROWTH - more teams, better partnerships, enhanced 
     ],
   },
 };
-console.log('✅ FSAA character loaded');
-console.log('📋 Plugins:', character.plugins);
-console.log('🤖 Telegram client config:', character.clients[0]?.config);
