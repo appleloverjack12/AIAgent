@@ -8,14 +8,11 @@ export const character: Character = {
   voice: {
     model: 'gpt-4o',
   },
-  model:'gpt-4o-mini'
 },
   
 
-
   plugins: [
     '@elizaos/plugin-sql',
-    ...(process.env.OPENAI_API_KEY?.trim() ? ['@elizaos/plugin-openai'] : []),
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
 
