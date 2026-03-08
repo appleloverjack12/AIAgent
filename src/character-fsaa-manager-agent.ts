@@ -7,7 +7,8 @@ export const character: Character = {
   },
   voice: {
     model: 'gpt-4o',
-  }
+  },
+  model:'gpt-4o-mini'
 },
   
 

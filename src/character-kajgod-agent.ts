@@ -3,11 +3,12 @@ export const character: Character = {
   name: 'KajgodIntelAgent',
   settings: {
   secrets: {
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY, 
   },
   voice: {
     model: 'gpt-4o',
-  }
+  },
+  model:'gpt-4o-mini'
 },
 
   plugins: [
