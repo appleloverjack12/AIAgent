@@ -280,7 +280,7 @@ LANGUAGE:
 
     'DAILY BRIEFING FORMAT:',
     '',
-    '📅 **KAJGOD JUTARNJI IZVJEŠTAJ — [DATUM]**',
+    ' **KAJGOD JUTARNJI IZVJEŠTAJ — [DATUM]**',
     '',
     '🎪 **Prilike za Eventove**',
     '   • Naziv eventa / organizator / lokacija',
