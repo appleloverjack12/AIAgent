@@ -1,32 +1,14 @@
 import { type Character } from '@elizaos/core';
-
-console.log('TEST_VAR:', process.env.TEST_VAR);
-console.log('\n=== KAJGOD ENVIRONMENT DEBUG ===');
-console.log('TELEGRAM_BOT_TOKEN_KAJGOD exists:', !!process.env.TELEGRAM_BOT_TOKEN_KAJGOD);
-console.log('TELEGRAM_BOT_TOKEN_KAJGOD length:', process.env.TELEGRAM_BOT_TOKEN_KAJGOD?.length || 0);
-console.log('TELEGRAM_BOT_TOKEN_KAJGOD first 10 chars:', process.env.TELEGRAM_BOT_TOKEN_KAJGOD?.substring(0, 10) || 'MISSING');
-console.log('====================================\n');
-
 export const character: Character = {
   name: 'KajgodIntelAgent',
   settings: {
   secrets: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN_KAJGOD,
   },
   voice: {
     model: 'gpt-4o',
   }
 },
-
-  clients: [{
-    type: 'telegram',
-    config: {
-      token: process.env.TELEGRAM_BOT_TOKEN_KAJGOD,
-      allowDirectMessages: true,
-      shouldOnlyJoinInAllowedGroups: false,
-    }
-  }],
 
   plugins: [
     '@elizaos/plugin-sql',
@@ -410,6 +392,3 @@ LANGUAGE:
     ],
   },
 };
-console.log('✅ Kajgod character loaded');
-console.log('📋 Plugins:', character.plugins);
-console.log('🤖 Telegram client config:', character.clients[0]?.config);
