@@ -8,6 +8,8 @@ export const character: Character = {
   voice: {
     model: 'gpt-4o',
   },
+  model: 'gpt-4o',
+  embeddingModel:'text-embedding-3-small'
 },
   
 
